@@ -3,9 +3,10 @@ var app = express()
 var router = express.Router()
 var path = require('path')
 var mysql = require('mysql')
+var crypto = require('crypto')
 
 var connection = mysql.createConnection({
-	host     : '',
+	host     : 'xxx.xxx.xxx.xxx',
 	port     : 3306,
 	user     : '',
 	password : '',
@@ -31,11 +32,15 @@ router.post('/', function(req,res){
 		if(!results[0])
 			return res.send('please check your email.');
 		var user = results[0];
-		if(passwd === user.member_pw){
-			return res.send('login success');
-		}else{
-			return res.send('please check your password.');
-		}
+		crypto.pbkdf2(passwd, user.salt, 100000, 64, 'sha256', function(err, derivedKey){
+			if(err)
+				console.log(err);
+			if(derivedKey.toString('hex') === user.member_pw){
+				return res.send('login success');
+			}else{
+				return res.send('please check your password.');
+			}
+		});
 	});
 })
 

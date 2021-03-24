@@ -3,9 +3,10 @@ var app = express()
 var router = express.Router()
 var path = require('path')
 var mysql = require('mysql')
+var crypto = require('crypto');
 
 var connection = mysql.createConnection({
-	host     : '',
+	host     : 'xxx.xxx.xxx.xxx',
 	port     : 3306,
 	user     : '',
 	password : '',
@@ -24,12 +25,25 @@ router.post('/', function(req,res){
 	var email = body.email;
 	var name = body.name;
 	var passwd = body.password;
-
-	var query = connection.query('insert into member_tb (member_email, member_name, member_pw) values ("' + email + '","' + name + '","' + passwd + '")', function(err, rows) {
-		if(err) { throw err;}
-		console.log("Data inserted!");
-		res.redirect('/');
-	})
+	var msalt = '';
+	var mpassword = '';
+	crypto.randomBytes(64, (err, buf) =>{
+		if(err) throw err;
+		msalt = buf.toString('hex');
+		console.log('salt : ', msalt);
+	
+		crypto.pbkdf2(passwd, msalt, 100000, 64, 'sha256',(err,derivedKey) => {
+			if(err) throw err;
+			mpassword = derivedKey.toString('hex');
+			console.log('mpasswd : ', mpassword, mpassword.length);
+	
+				var query = connection.query('insert into member_tb (member_email, member_name, member_pw, salt) values ("' + email + '","' + name + '","' + mpassword + '","' + msalt + '")', function(err, rows) {
+				if(err) { throw err;}
+				console.log("Data inserted!");
+				res.redirect('/');
+			});
+		});
+	});
 })
 
 module.exports = router;
