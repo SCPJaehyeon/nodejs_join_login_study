@@ -1,6 +1,11 @@
 # nodejs_study
 personal_study
 
+1. Please Make '.env' file > JWT KEY
+2. npm install
+3. npm start
+
+
 database (for test)>
 
 member_tb(
