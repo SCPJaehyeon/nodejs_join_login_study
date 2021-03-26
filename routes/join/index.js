@@ -6,11 +6,11 @@ var mysql = require('mysql')
 var crypto = require('crypto');
 
 var connection = mysql.createConnection({
-	host     : 'xxx.xxx.xxx.xxx',
+	host     : 'xx.xxx.xxx.xxx',
 	port     : 3306,
-	user     : '',
-	password : '',
-	database : ''
+	user     : 'xxx',
+	password : 'xxx',
+	database : 'xxx'
 });
 
 connection.connect();
@@ -32,7 +32,7 @@ router.post('/', function(req,res){
 		msalt = buf.toString('hex');
 		console.log('salt : ', msalt);
 	
-		crypto.pbkdf2(passwd, msalt, 100000, 64, 'sha256',(err,derivedKey) => {
+		crypto.pbkdf2(passwd, msalt, 100000, 64, 'sha512',(err,derivedKey) => {
 			if(err) throw err;
 			mpassword = derivedKey.toString('hex');
 			console.log('mpasswd : ', mpassword, mpassword.length);

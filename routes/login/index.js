@@ -5,12 +5,16 @@ var path = require('path')
 var mysql = require('mysql')
 var crypto = require('crypto')
 
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
+const { verifyToken } = require('../middleware');
+
 var connection = mysql.createConnection({
-	host     : 'xxx.xxx.xxx.xxx',
+	host     : 'xx.xxx.xxx.xxx',
 	port     : 3306,
-	user     : '',
-	password : '',
-	database : ''
+	user     : 'xxx',
+	password : 'xxx',
+	database : 'xxx'
 });
 
 connection.connect();
@@ -19,6 +23,9 @@ router.get('/', function(req,res){
 	console.log('get login url')
 	res.sendFile(path.join(__dirname, '../../public/login.html'))
 })
+router.get('/test', verifyToken, (req,res)=>{
+	res.json(req.decoded);
+});
 
 router.post('/', function(req,res){
 	var body = req.body;
@@ -32,16 +39,29 @@ router.post('/', function(req,res){
 		if(!results[0])
 			return res.send('please check your email.');
 		var user = results[0];
-		crypto.pbkdf2(passwd, user.salt, 100000, 64, 'sha256', function(err, derivedKey){
+		var user_email = user.member_email;
+		crypto.pbkdf2(passwd, user.salt, 100000, 64, 'sha512', function(err, derivedKey){
 			if(err)
 				console.log(err);
 			if(derivedKey.toString('hex') === user.member_pw){
-				return res.send('login success');
-			}else{
+				const token = jwt.sign({
+					user_email
+				}, process.env.JWT_SECRET, {
+					expiresIn: '1d',
+					issuer: '토큰발급자',
+				});
+				res.cookie('user', token);
+				return res.json({
+					code: 200,
+					message: '토큰이 발급되었습니다.',
+					token,
+				});
+			}
+				//return res.send('login success');
+			else{
 				return res.send('please check your password.');
 			}
 		});
 	});
 })
-
 module.exports = router;
