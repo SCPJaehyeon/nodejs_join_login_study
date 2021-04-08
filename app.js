@@ -42,9 +42,9 @@ app.use(function(err, req, res, next) {
 
 
 const options = {
-	  key: fs.readFileSync('/etc/letsencrypt/live/csecret.ga/privkey.pem'),
-	  cert: fs.readFileSync('/etc/letsencrypt/live/csecret.ga/cert.pem'),
-	  ca: fs.readFileSync('/etc/letsencrypt/live/csecret.ga/fullchain.pem'),
+	  key: fs.readFileSync('/etc/letsencrypt/live/xxxx.xx/privkey.pem'),
+	  cert: fs.readFileSync('/etc/letsencrypt/live/xxxx.xx/cert.pem'),
+	  ca: fs.readFileSync('/etc/letsencrypt/live/xxxx.xx/fullchain.pem'),
 	  minVersion: "TLSv1.2" 
 };
 https.createServer(options, app, (req, res) => {
